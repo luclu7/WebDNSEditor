@@ -7,7 +7,7 @@
     <label>Domain <input ref="domain" type="text"></label>
     <label>Algo <input ref="algo" type="text"></label>
     <br><br>
-    <b-button v-on:click=test>Get records</b-button>
+    <b-button v-if="fieldAreFull == true" v-on:click=test>Get records</b-button>
     <br><br>
     <b-table
         :data="data"
@@ -64,11 +64,12 @@ export default {
         "keyname": "key",
         "domain": "jsp.lol.",
         "key": "2vzVzhEzXQvFUCxtLtgi0benURC/7KGIdIsDxg5dN5XcrCSZInH0s2yToxeYO2Q9BcgWQbEjwcM6uWyRjueGhA==",
-        "algo": "hmac-sha512",
-        "server": "127.0.0.1:53"
+        "algo": this.$refs.algo.value,
+        "server": this.$refs.server.value,
       };
       let payload = encodeURIComponent(JSON.stringify(requestData));
-      fetch("http://localhost:8080/getRecords?data=" + payload)
+      console.log(payload);
+      fetch(process.env.API_URL+"/getRecords?data=" + payload)
           .then(function (response) {
             // The response is a Response instance.
             // You parse the data into a useable format using `.json()`
@@ -90,9 +91,11 @@ data() {
   let data = [
   ]
   let index=1;
+  let fieldAreFull = false;
   return {
     data,
-    index
+    index,
+    fieldAreFull
   }
 
 }
