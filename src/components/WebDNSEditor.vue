@@ -10,8 +10,7 @@
           </b-input>
         </b-field>
 
-
-        <b-select placeholder="Select a name">
+        <b-select placeholder="Please select an algorithm" v-model="algo">
           <option value="hmac-sha512">hmac-sha512</option>
           <option value="hmac-sha256">hmac-sha256</option>
           <option value="hmac-sha384">hmac-sha384</option>
@@ -32,7 +31,7 @@
                    password-reveal>
           </b-input>
         </b-field>
-        <b-button disabled v-on:click=getRecords>Get records</b-button>
+        <b-button v-on:click=getRecords>Get records</b-button>
       </div>
     </div>
     <br><br>
@@ -68,8 +67,6 @@ export default {
   name: 'WebDNSEditor',
   methods: {
     getRecords: function () {
-      console.log(this.$refs.algo.value);
-
       let dataaa = this.data;
       let indexx = 1;
       let requestData = {
@@ -80,8 +77,8 @@ export default {
         "server": this.server,
       };
       let payload = encodeURIComponent(JSON.stringify(requestData));
-      console.log(process.env.API_URL + "/getrecords?data=" + payload);
-      fetch("http://localhost:8080/getrecords?data=" + payload)
+      console.log(process.env.API_URL + "/getRecords?data=" + payload);
+      fetch("http://localhost:8080/getRecords?data=" + payload)
           .then(function (response) {
             // The response is a Response instance.
             // You parse the data into a useable format using `.json()`
@@ -93,7 +90,7 @@ export default {
             'id': indexx,
             'first_name': element.Hdr.Name,
             'last_name': element.Hdr.ttl,
-            'type': "lala",
+            'type': element.Hdr,
             'gender': 'Male'
           };
 
@@ -118,6 +115,7 @@ export default {
       data,
       index,
       fieldAreFull,
+      "algo": "hmac-sha512",
       "name": 'jsp.lol.',
       "server": '127.0.0.1:53',
       "keyname": 'key',
