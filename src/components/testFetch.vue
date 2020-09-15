@@ -1,6 +1,43 @@
 <template>
   <div>
     <h1>Hey</h1>
+    <div class="columns">
+      <div class="column is-half">
+        <b-field label="DNS Server">
+          <b-input v-model="name"></b-input>
+        </b-field>
+        <b-field label="DNS Server">
+          <b-input type="text" v-model="server">
+          </b-input>
+        </b-field>
+
+
+      <b-select placeholder="Select a name">
+        <option
+            v-for="option in data.options"
+            :value="option.id"
+            :key="option.id">
+          {{ options.test }}
+        </option>
+      </b-select>
+      </div>
+
+      <div class="column if-half">
+        <b-field label="Key name">
+          <b-input type="text" v-model="keyname">
+          </b-input>
+        </b-field>
+
+        <b-field label="Key">
+          <b-input type="password"
+                   v-model="key"
+                   password-reveal>
+          </b-input>
+        </b-field>
+      </div>
+    </div>
+
+
     <label>Server <input ref="server" ype="text"></label>
     <label>Key <input ref="key" type="text"></label>
     <label>Key name <input ref="key-name" type="text"></label>
@@ -68,36 +105,44 @@ export default {
         "server": this.$refs.server.value,
       };
       let payload = encodeURIComponent(JSON.stringify(requestData));
-      console.log(payload);
-      fetch(process.env.API_URL+"/getRecords?data=" + payload)
+      console.log(process.env.API_URL+"/getrecords?data=" + payload);
+      fetch("http://localhost:8080/getrecords?data=" + payload)
           .then(function (response) {
             // The response is a Response instance.
             // You parse the data into a useable format using `.json()`
             return response.json();
           }).then(function (data) {
-            // `data` is the parsed version of the JSON returned from the above endpoint.
-            data.forEach((element) => {
-              let currData = { 'id': indexx, 'first_name': element.Hdr.Name, 'last_name': element.Hdr.ttl, 'type': "lala", 'gender': 'Male' };
+        // `data` is the parsed version of the JSON returned from the above endpoint.
+        data.forEach((element) => {
+          let currData = { 'id': indexx, 'first_name': element.Hdr.Name, 'last_name': element.Hdr.ttl, 'type': "lala", 'gender': 'Male' };
 
-              dataaa.splice(indexx + 1, 0, currData);
-              indexx=indexx+1;  // { "userId": 1, "id": 1, "title": "...", "body": "..." }
-          })});
+          dataaa.splice(indexx + 1, 0, currData);
+          indexx=indexx+1;  // { "userId": 1, "id": 1, "title": "...", "body": "..." }
+        })});
       this.data = dataaa;
       this.index = indexx;
       console.log(this.data)
-}
-},
-data() {
-  let data = [
-  ]
-  let index=1;
-  let fieldAreFull = false;
-  return {
-    data,
-    index,
-    fieldAreFull
-  }
+    }
+  },
+  data() {
+    let data = [
+    ]
 
-}
+    let index=1;
+    let fieldAreFull = false;
+    let options = [
+      {id: 1, "test":"lalal"}
+    ]
+    return {
+      data,
+      index,
+      fieldAreFull,
+      "name": 'jsp.lol.',
+      "server": '127.0.0.1:53',
+      "keyname": 'key',
+      "key": "2vzVzhEzXQvFUCxtLtgi0benURC/7KGIdIsDxg5dN5XcrCSZInH0s2yToxeYO2Q9BcgWQbEjwcM6uWyRjueGhA==",
+      options
+    }
+  }
 }
 </script>
