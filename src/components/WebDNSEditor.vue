@@ -63,6 +63,8 @@
 
 <script>
 
+const tt = require("rr-to-type");
+
 export default {
   name: 'WebDNSEditor',
   methods: {
@@ -71,14 +73,14 @@ export default {
       let indexx = 1;
       let requestData = {
         "keyname": this.keyname,
-        "domain": "jsp.lol.",
-        "key": "2vzVzhEzXQvFUCxtLtgi0benURC/7KGIdIsDxg5dN5XcrCSZInH0s2yToxeYO2Q9BcgWQbEjwcM6uWyRjueGhA==",
+        "domain": this.domain,
+        "key": this.key,
         "algo": this.algo,
         "server": this.server,
       };
       let payload = encodeURIComponent(JSON.stringify(requestData));
       console.log(process.env.API_URL + "/getRecords?data=" + payload);
-      fetch("http://localhost:8080/getRecords?data=" + payload)
+      fetch("http://10.10.2.1:8088/getRecords?data=" + payload)
           .then(function (response) {
             // The response is a Response instance.
             // You parse the data into a useable format using `.json()`
@@ -86,12 +88,16 @@ export default {
           }).then(function (data) {
         // `data` is the parsed version of the JSON returned from the above endpoint.
         data.forEach((element) => {
+
+          let recordType = tt.RRToType(element.Hdr.Rrtype)
+         // let recordData =
+          eval(name)
           let currData = {
             'id': indexx,
             'first_name': element.Hdr.Name,
-            'last_name': element.Hdr.ttl,
-            'type': element.Hdr,
-            'gender': 'Male'
+            'last_name': element,
+            'type': recordType,
+            'gender': ""
           };
 
           dataaa.splice(indexx + 1, 0, currData);
@@ -117,7 +123,7 @@ export default {
       fieldAreFull,
       "algo": "hmac-sha512",
       "name": 'jsp.lol.',
-      "server": '127.0.0.1:53',
+      "server": '10.10.2.1:53',
       "keyname": 'key',
       "key": "2vzVzhEzXQvFUCxtLtgi0benURC/7KGIdIsDxg5dN5XcrCSZInH0s2yToxeYO2Q9BcgWQbEjwcM6uWyRjueGhA==",
       options
