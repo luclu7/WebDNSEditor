@@ -21,7 +21,7 @@ const routes = [
   {
     path: "/test",
     name: "test",
-    component: () => import("../components/testFetch.vue")
+    component: () => import("../components/WebDNSEditor.vue")
   }
 ]
 

@@ -7,11 +7,11 @@
 
 <script>
 
-import test from "../components/testFetch.vue"
+import test from "../components/WebDNSEditor.vue"
 
 export default {
   components: {
-      test
+    test
     }
 }
 </script>
