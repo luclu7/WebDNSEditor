@@ -1,5 +1,7 @@
 <template>
   <div>
+    <SOA n-s="lalal.fr"></SOA>
+    <h1>Poor man's Web DNS editor</h1>
     <div class="columns">
       <div class="column is-half">
         <b-field label="DNS Server">
@@ -55,6 +57,7 @@
         :hoverable="true"
         :loading="false"
         :focusable="false"
+        :searchable="true"
         :mobile-cards="true">
 
       <b-table-column field="id" label="ID" width="40" numeric v-slot="props">
@@ -94,6 +97,7 @@ function transformRecordType(record) {
       return capitalizeFirstLetter(record.toLowerCase())
   }
 }
+import SOA from "@/components/SOA";
 
 export default {
   name: 'WebDNSEditor',
@@ -127,13 +131,22 @@ export default {
 
           let rtarget = "element." + recordAjusted;
           let recordTarget = eval(rtarget);
-
+          console.log(recordAjusted);
           switch (recordAjusted) {
-            case "SOA":
+            case "Soa":
+              recordTarget = "NS: "+element.Ns
+              recordTarget += "| Mailbox: "+ element.Mbox;
+              recordTarget += "| Serial: "+ element.Serial;
+              recordTarget += "| Refresh: "+ element.Refresh;
+              recordTarget += "| MinTTL: "+ element.Minttl;
+              recordTarget += "| Retry: "+ element.Retry;
+
+              console.log(element);
               break
             default:
-
+              break
           }
+
 
 
           let currData = {
@@ -188,6 +201,10 @@ export default {
       "isGetDisabled": false,
       "isSendDisabled": true,
     }
+  },
+  components: {
+    // eslint-disable-next-line vue/no-unused-components
+    SOA
   }
 }
 </script>

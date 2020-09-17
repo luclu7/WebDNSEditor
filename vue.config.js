@@ -12,5 +12,14 @@ module.exports = {
           }
       }, 
       disableHostCheck : true
-  }
+  },
+    chainWebpack: config => {
+        config
+            .plugin('html')
+            .tap(args => {
+                args[0].title = 'Web DNS editor(n\'t)'
+                return args
+            })
+    }
+
 }

@@ -1,12 +1,19 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/test">DNS</router-link>
     </div>
-    <router-view/>
+      <web-d-n-s-editor></web-d-n-s-editor>
   </div>
 </template>
+
+<script>
+import WebDNSEditor from "@/views/WebDNSEditor";
+export default {
+  components: {WebDNSEditor}
+}
+
+
+</script>
 
 <style>
 #app {
@@ -26,7 +33,4 @@
   color: #2c3e50;
 }
 
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
 </style>
