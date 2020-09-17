@@ -4,8 +4,8 @@
     <h1>Poor man's Web DNS editor</h1>
     <div class="columns">
       <div class="column is-half">
-        <b-field label="DNS Server">
-          <b-input v-model="name"></b-input>
+        <b-field label="Domain name">
+          <b-input v-model="domain"></b-input>
         </b-field>
         <b-field label="DNS Server">
           <b-input type="text" v-model="server">
@@ -29,7 +29,7 @@
 
         <b-field label="Key">
           <b-input type="password"
-                   v-model="key"
+                   v-model="secretKey"
                    password-reveal>
           </b-input>
         </b-field>
@@ -105,22 +105,23 @@ export default {
     getRecords: async function () {
       let dataaa = this.data;
       this.isLoading = true;
-      //this.$refs.submitButton.$props.$emit("loading", true);
+
       let indexx = 1;
       let requestData = {
         "keyname": this.keyname,
-        "domain": "jsp.lol.",
-        "key": "2vzVzhEzXQvFUCxtLtgi0benURC/7KGIdIsDxg5dN5XcrCSZInH0s2yToxeYO2Q9BcgWQbEjwcM6uWyRjueGhA==",
+        "domain": this.domain,
+        "key": this.secretKey,
         "algo": this.algo,
         "server": this.server,
       };
       let payload = encodeURIComponent(JSON.stringify(requestData));
       await new Promise(r => setTimeout(r, Math.random()*200));
-      console.log("http://localhost:8080/getRecords?data=" + payload);
-      fetch("http://localhost:8080/getRecords?data=" + payload)
+      //console.log("http://localhost:8080/getRecords?data=" + payload);
+      fetch("http://95.217.181.166:8080/getRecords?data=" + payload)
           .then(function (response) {
             // The response is a Response instance.
             // You parse the data into a useable format using `.json()`
+
             return response.json();
           }).then(function (data) {
         // `data` is the parsed version of the JSON returned from the above endpoint.
@@ -131,7 +132,7 @@ export default {
 
           let rtarget = "element." + recordAjusted;
           let recordTarget = eval(rtarget);
-          console.log(recordAjusted);
+
           switch (recordAjusted) {
             case "Soa":
               recordTarget = "NS: "+element.Ns
@@ -141,30 +142,25 @@ export default {
               recordTarget += "| MinTTL: "+ element.Minttl;
               recordTarget += "| Retry: "+ element.Retry;
 
-              console.log(element);
               break
             default:
               break
           }
 
-
-
           let currData = {
             'id': indexx,
             'name': element.Hdr.Name,
             'type': typeRecord,
-            'gender': 'Male',
             'target': recordTarget,
             'ttl': element.Hdr.Ttl
           };
 
           dataaa.splice(indexx + 1, 0, currData);
-          indexx = indexx + 1;  // { "userId": 1, "id": 1, "title": "...", "body": "..." }
+          indexx = indexx + 1;
         })
       });
       this.data = dataaa;
       this.index = indexx;
-      console.log(this.data)
       this.isLoading = false;
       this.isClearDisabled = false;
       this.isSendDisabled = false;
@@ -183,19 +179,16 @@ export default {
 
     let index = 1;
     let fieldAreFull = false;
-    let options = [
-      {id: 1, "test": "lalal"}
-    ]
+    let secretKey, server, domain, algo, keyname;
     return {
       data,
       index,
       fieldAreFull,
-      "algo": "hmac-sha512",
-      "name": 'jsp.lol.',
-      "server": '127.0.0.1:53',
-      "keyname": 'key',
-      "key": "2vzVzhEzXQvFUCxtLtgi0benURC/7KGIdIsDxg5dN5XcrCSZInH0s2yToxeYO2Q9BcgWQbEjwcM6uWyRjueGhA==",
-      options,
+      algo,
+      domain,  //'jsp.lol.',
+      server,
+      secretKey,
+      keyname,
       "isLoading": false,
       "isClearDisabled": true,
       "isGetDisabled": false,
@@ -205,6 +198,41 @@ export default {
   components: {
     // eslint-disable-next-line vue/no-unused-components
     SOA
+  },
+  mounted() {
+    if (localStorage.secretKey) {
+      this.secretKey = localStorage.secretKey;
+    }
+    if (localStorage.domain) {
+      this.domain = localStorage.domain;
+    }
+    if (localStorage.keyname) {
+      this.keyname = localStorage.keyname;
+    }
+    if (localStorage.server) {
+      this.server = localStorage.server;
+    }
+    if (localStorage.algo) {
+      this.algo = localStorage.algo;
+    }
+  },
+  watch: {
+    secretKey(newKey) {
+      localStorage.secretKey = newKey;
+    },
+    domain(newDomain) {
+      localStorage.domain = newDomain;
+    },
+    keyname(newKeyName) {
+      localStorage.keyname = newKeyName;
+    },
+    server(newServer) {
+      localStorage.server = newServer;
+    },
+    algo(newAlgo) {
+      localStorage.algo = newAlgo;
+    }
   }
+
 }
 </script>
