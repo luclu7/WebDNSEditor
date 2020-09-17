@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding-left: 1em; padding-right: 1em;">
     <h1>Poor man's Web DNS editor</h1>
     <div class="columns">
       <div class="column is-half">
@@ -33,12 +33,12 @@
           </b-input>
         </b-field>
         <div class="columns">
-        <div class="column is-half">
-          <b-button ref="submitButton" type="is-primary" v-bind:loading=isLoading v-bind:disabled=isGetDisabled v-on:click=getRecords>Get records</b-button>
+          <div class="column is-half">
+            <b-button ref="submitButton" type="is-primary" v-bind:loading=isLoading v-bind:disabled=isGetDisabled v-on:click=getRecords>Get records</b-button>
           </div>
-        <div class="column is-half">
-          <b-button ref="submitButton" type="is-danger is-light" v-bind:disabled=isClearDisabled v-on:click=clearRecords>Clear records</b-button>
-        </div>
+          <div class="column is-half">
+            <b-button ref="submitButton" type="is-danger is-light" v-bind:disabled=isClearDisabled v-on:click=clearRecords>Clear records</b-button>
+          </div>
         </div>
         <b-button type="is-success" light v-bind:disabled=isSendDisabled>Send records</b-button>
       </div>
