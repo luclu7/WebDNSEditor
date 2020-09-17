@@ -1,6 +1,5 @@
 <template>
   <div>
-    <SOA n-s="lalal.fr"></SOA>
     <h1>Poor man's Web DNS editor</h1>
     <div class="columns">
       <div class="column is-half">
@@ -97,8 +96,6 @@ function transformRecordType(record) {
       return capitalizeFirstLetter(record.toLowerCase())
   }
 }
-import SOA from "@/components/SOA";
-
 export default {
   name: 'WebDNSEditor',
   methods: {
@@ -196,8 +193,7 @@ export default {
     }
   },
   components: {
-    // eslint-disable-next-line vue/no-unused-components
-    SOA
+
   },
   mounted() {
     if (localStorage.secretKey) {
