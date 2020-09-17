@@ -31,10 +31,22 @@
                    password-reveal>
           </b-input>
         </b-field>
-        <b-button v-on:click=getRecords>Get records</b-button>
+        <div class="columns">
+        <div class="column is-half">
+          <b-button ref="submitButton" type="is-primary" v-bind:loading=isLoading v-bind:disabled=isGetDisabled v-on:click=getRecords>Get records</b-button>
+          </div>
+        <div class="column is-half">
+          <b-button ref="submitButton" type="is-danger is-light" v-bind:disabled=isClearDisabled v-on:click=clearRecords>Clear records</b-button>
+        </div>
+        </div>
+        <b-button type="is-success" light v-bind:disabled=isSendDisabled>Send records</b-button>
       </div>
     </div>
+
+
     <br><br>
+
+
     <b-table
         :data="data"
         :bordered="true"
@@ -48,26 +60,48 @@
       <b-table-column field="id" label="ID" width="40" numeric v-slot="props">
         {{ props.row.id }}
       </b-table-column>
-      <b-table-column field="first_name" label="Name" v-slot="props">
-        {{ props.row.first_name }}
+      <b-table-column field="name" label="Name" v-slot="props">
+        {{ props.row.name }}
       </b-table-column>
-      <b-table-column field="last_name" label="Target" v-slot="props">
-        {{ props.row.last_name }}
+      <b-table-column field="target" label="Target" v-slot="props">
+        {{ props.row.target }}
       </b-table-column>
       <b-table-column field="type" label="Type" v-slot="props">
         {{ props.row.type }}
+      </b-table-column>
+      <b-table-column field="ttl" label="TTL" v-slot="props" width="50">
+        {{ props.row.ttl }}
       </b-table-column>
     </b-table>
   </div>
 </template>
 
 <script>
+import rrtt from "rr-to-type";
+
+// eslint-disable-next-line no-unused-vars
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function transformRecordType(record) {
+  switch (record) {
+    case "A":
+      return "A"
+    case "AAAA":
+      return "AAAA"
+    default:
+      return capitalizeFirstLetter(record.toLowerCase())
+  }
+}
 
 export default {
   name: 'WebDNSEditor',
   methods: {
-    getRecords: function () {
+    getRecords: async function () {
       let dataaa = this.data;
+      this.isLoading = true;
+      //this.$refs.submitButton.$props.$emit("loading", true);
       let indexx = 1;
       let requestData = {
         "keyname": this.keyname,
@@ -77,7 +111,8 @@ export default {
         "server": this.server,
       };
       let payload = encodeURIComponent(JSON.stringify(requestData));
-      console.log(process.env.API_URL + "/getRecords?data=" + payload);
+      await new Promise(r => setTimeout(r, Math.random()*200));
+      console.log("http://localhost:8080/getRecords?data=" + payload);
       fetch("http://localhost:8080/getRecords?data=" + payload)
           .then(function (response) {
             // The response is a Response instance.
@@ -86,12 +121,28 @@ export default {
           }).then(function (data) {
         // `data` is the parsed version of the JSON returned from the above endpoint.
         data.forEach((element) => {
+
+          let typeRecord = rrtt.RRToType(element.Hdr.Rrtype);
+          let recordAjusted = transformRecordType(typeRecord);
+
+          let rtarget = "element." + recordAjusted;
+          let recordTarget = eval(rtarget);
+
+          switch (recordAjusted) {
+            case "SOA":
+              break
+            default:
+
+          }
+
+
           let currData = {
             'id': indexx,
-            'first_name': element.Hdr.Name,
-            'last_name': element.Hdr.ttl,
-            'type': element.Hdr,
-            'gender': 'Male'
+            'name': element.Hdr.Name,
+            'type': typeRecord,
+            'gender': 'Male',
+            'target': recordTarget,
+            'ttl': element.Hdr.Ttl
           };
 
           dataaa.splice(indexx + 1, 0, currData);
@@ -101,6 +152,17 @@ export default {
       this.data = dataaa;
       this.index = indexx;
       console.log(this.data)
+      this.isLoading = false;
+      this.isClearDisabled = false;
+      this.isSendDisabled = false;
+      this.isGetDisabled = true;
+    },
+    clearRecords: function () {
+      this.data = [];
+      this.index = 0;
+      this.isClearDisabled = true;
+      this.isSendDisabled = true;
+      this.isGetDisabled = false;
     }
   },
   data() {
@@ -120,7 +182,11 @@ export default {
       "server": '127.0.0.1:53',
       "keyname": 'key',
       "key": "2vzVzhEzXQvFUCxtLtgi0benURC/7KGIdIsDxg5dN5XcrCSZInH0s2yToxeYO2Q9BcgWQbEjwcM6uWyRjueGhA==",
-      options
+      options,
+      "isLoading": false,
+      "isClearDisabled": true,
+      "isGetDisabled": false,
+      "isSendDisabled": true,
     }
   }
 }

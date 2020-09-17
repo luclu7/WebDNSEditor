@@ -6978,6 +6978,11 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
+rr-to-type@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/rr-to-type/-/rr-to-type-1.0.4.tgz#c0eb2be614a0945065d43239a279222d4020dd14"
+  integrity sha512-qzcy298l2xPLK045ZFjqdhEmsM5ajNaS7EVhrlcchCbgUXb+FCooRBEOnlcZb3g4ITHHqJ7yNba8wEQ/MhOFsA==
+
 run-async@^2.4.0:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/run-async/-/run-async-2.4.1.tgz#8440eccf99ea3e70bd409d49aab88e10c189a455"
