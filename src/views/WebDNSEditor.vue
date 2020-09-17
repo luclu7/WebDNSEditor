@@ -33,14 +33,17 @@
           </b-input>
         </b-field>
         <div class="columns">
-          <div class="column is-half">
+          <div class="column is-one-third">
             <b-button ref="submitButton" type="is-primary" v-bind:loading=isLoading v-bind:disabled=isGetDisabled v-on:click=getRecords>Get records</b-button>
           </div>
-          <div class="column is-half">
+          <div class="column is-one-third">
             <b-button ref="submitButton" type="is-danger is-light" v-bind:disabled=isClearDisabled v-on:click=clearRecords>Clear records</b-button>
           </div>
+          <div class="column is-one-third">
+            <b-button type="is-success" light v-bind:disabled=isSendDisabled>Send records</b-button>
+          </div>
         </div>
-        <b-button type="is-success" light v-bind:disabled=isSendDisabled>Send records</b-button>
+
       </div>
     </div>
 
@@ -114,7 +117,7 @@ export default {
       let payload = encodeURIComponent(JSON.stringify(requestData));
       await new Promise(r => setTimeout(r, Math.random()*200));
       //console.log("http://localhost:8080/getRecords?data=" + payload);
-      fetch("http://95.217.181.166:8080/getRecords?data=" + payload)
+      fetch("https://webdns.luc.ovh/getRecords?data=" + payload)
           .then(function (response) {
             // The response is a Response instance.
             // You parse the data into a useable format using `.json()`
