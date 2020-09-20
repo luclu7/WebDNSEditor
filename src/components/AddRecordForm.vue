@@ -5,11 +5,11 @@
     </header>
     <section class="modal-card-body">
       <b-field label="Record type">
-      <b-select v-model="typeOfRecord">
-        <option value="A">A</option>
-        <option value="AAAA">AAAA</option>
-        <option value="CNAME">CNAME</option>
-      </b-select>
+        <b-select v-model="typeOfRecord">
+          <option value="A">A</option>
+          <option value="AAAA">AAAA</option>
+          <option value="CNAME">CNAME</option>
+        </b-select>
       </b-field>
 
       <div>
@@ -20,17 +20,17 @@
         </b-field>
       </div>
 
+
       <b-field label="Subdomain">
-        <b-input
-            v-model="subdomain"
-            :value="subdomain"
-            placeholder="sub.example.com."
-            required>
-        </b-input>
+        <b-input v-model="subdomain" :value="subdomain" placeholder="sub" expanded></b-input>
+        <p class="control">
+          <span class="button is-static">.{{ domain }}</span>
+        </p>
       </b-field>
 
       <b-field label="TTL">
         <b-input v-model="TTL"
+                 required
                  type="number">
 
         </b-input>
@@ -47,7 +47,9 @@
 <script>
 export default {
   name: "AddRecordForm",
-props: ['email', 'password'],
+  props: {
+    domain: String
+  },
   data() {
     let target, subdomain;
     return {
@@ -59,7 +61,7 @@ props: ['email', 'password'],
   },
   methods: {
     sendData: function () {
-      this.$emit('sendNewRecord', [this.subdomain,this.target,this.typeOfRecord,this.TTL])
+      this.$emit('sendNewRecord', [this.subdomain+"."+this.domain,this.target,this.typeOfRecord,this.TTL])
     }
   },
   change: {

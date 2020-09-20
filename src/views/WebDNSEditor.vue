@@ -49,7 +49,7 @@
                 aria-role="dialog"
                 aria-modal>
               <template #default="props">
-                <AddRecordForm @sendNewRecord="addNewRecord" v-bind="formProps" @close="props.close"></AddRecordForm>
+                <AddRecordForm @sendNewRecord="addNewRecord" v-bind="formProps" :domain="domain" @close="props.close"></AddRecordForm>
               </template>
             </b-modal>
 
@@ -85,7 +85,7 @@
       <b-table-column field="name" label="Name" v-slot="props">
         {{ props.row.name }}
       </b-table-column>
-      <b-table-column field="target" label="Target" v-slot="props">
+      <b-table-column field="target" label="Target" v-slot="props" width="80">
         {{ props.row.target }}
       </b-table-column>
       <b-table-column field="type" label="Type" v-slot="props">
@@ -150,7 +150,7 @@ export default {
 
           let rtarget = "element." + recordAjusted;
           let recordTarget = eval(rtarget);
-
+          console.log(recordAjusted)
           switch (recordAjusted) {
             case "Soa":
               recordTarget = "NS: "+element.Ns
@@ -159,7 +159,9 @@ export default {
               recordTarget += "| Refresh: "+ element.Refresh;
               recordTarget += "| MinTTL: "+ element.Minttl;
               recordTarget += "| Retry: "+ element.Retry;
-
+              break
+            case "Cname":
+              recordTarget = element.Target
               break
             default:
               break
