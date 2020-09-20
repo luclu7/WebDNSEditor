@@ -33,17 +33,34 @@
           </b-input>
         </b-field>
         <div class="columns">
-          <div class="column is-one-third">
+          <div class="column is-one-quarter">
             <b-button ref="submitButton" type="is-primary" v-bind:loading=isLoading v-bind:disabled=isGetDisabled v-on:click=getRecords>Get records</b-button>
           </div>
-          <div class="column is-one-third">
+          <div class="column is-one-quarter">
+            <button class="button is-light is-primary"
+                    @click="isComponentModalActive = true">
+              Add record
+            </button>
+            <b-modal
+                v-model="isComponentModalActive"
+                has-modal-card
+                trap-focus
+                :destroy-on-hide="false"
+                aria-role="dialog"
+                aria-modal>
+              <template #default="props">
+                <AddRecordForm @sendNewRecord="addNewRecord" v-bind="formProps" @close="props.close"></AddRecordForm>
+              </template>
+            </b-modal>
+
+          </div>
+          <div class="column is-one-quarter">
             <b-button ref="submitButton" type="is-danger is-light" v-bind:disabled=isClearDisabled v-on:click=clearRecords>Clear records</b-button>
           </div>
-          <div class="column is-one-third">
-            <b-button type="is-success" light v-bind:disabled=isSendDisabled>Send records</b-button>
+          <div class="column is-one-quarter">
+            <b-button type="is-success" light v-bind:disabled=isSendDisabled @click="sendRecords">Send records</b-button>
           </div>
         </div>
-
       </div>
     </div>
 
@@ -83,8 +100,8 @@
 
 <script>
 import rrtt from "rr-to-type";
+import AddRecordForm from "@/components/AddRecordForm";
 
-// eslint-disable-next-line no-unused-vars
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -117,7 +134,8 @@ export default {
       let payload = encodeURIComponent(JSON.stringify(requestData));
       await new Promise(r => setTimeout(r, Math.random()*200));
       //console.log("http://localhost:8080/getRecords?data=" + payload);
-      fetch("https://webdns.luc.ovh/getRecords?data=" + payload)
+      //fetch("https://webdns.luc.ovh/getRecords?data=" + payload)
+        fetch("http://localhost:8080/getRecords?data=" + payload)
           .then(function (response) {
             // The response is a Response instance.
             // You parse the data into a useable format using `.json()`
@@ -172,11 +190,52 @@ export default {
       this.isClearDisabled = true;
       this.isSendDisabled = true;
       this.isGetDisabled = false;
+    },
+    addNewRecord(variable) {
+      this.test = variable;
+      console.log(variable);
+
+      let currData = {
+        'id': this.index,
+        'name': variable[0],
+        'type': variable[2],
+        'target': variable[1],
+        'ttl': variable[3]
+      };
+
+      this.data.splice(this.index + 1, 0, currData);
+      this.addedRecords.splice(this.index, 0, currData);
+      this.index++
+    },
+    sendRecords() {
+      let requestData= {
+        "keyname": this.keyname,
+        "domain": this.domain,
+        "key": this.secretKey,
+        "algo": this.algo,
+        "server": this.server,
+        "newRecords": this.addedRecords,
+      };
+      console.log(requestData)
+      console.log(JSON.stringify(requestData));
+      let payload = encodeURIComponent(JSON.stringify(requestData));
+      console.log(payload)
+
+      this.$buefy.dialog.confirm({
+        message: 'Are you sure you want to continue?',
+        onConfirm: function (){
+          fetch("http://localhost:8080/addRecords?data=" + payload)
+              .then(function (response) {
+                // The response is a Response instance.
+                // You parse the data into a useable format using `.json()`
+                console.log(response);
+              })
+        }})
     }
   },
   data() {
     let data = []
-
+    let addedRecords = []
     let index = 1;
     let fieldAreFull = false;
     let secretKey, server, domain, algo, keyname;
@@ -189,6 +248,10 @@ export default {
       server,
       secretKey,
       keyname,
+      addedRecords,
+      isComponentModalActive: false,
+      formProps: {
+      },
       "isLoading": false,
       "isClearDisabled": true,
       "isGetDisabled": false,
@@ -196,7 +259,7 @@ export default {
     }
   },
   components: {
-
+    AddRecordForm
   },
   mounted() {
     if (localStorage.secretKey) {
