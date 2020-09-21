@@ -4,7 +4,7 @@
     <div class="columns">
       <div class="column is-half">
         <b-field label="Domain name">
-          <b-input v-model="domain"></b-input>
+          <b-input :disabled="isDomainInputDisabled" v-model="domain"></b-input>
         </b-field>
         <b-field label="DNS Server">
           <b-input type="text" v-model="server">
@@ -37,7 +37,7 @@
             <b-button ref="submitButton" type="is-primary" v-bind:loading=isLoading v-bind:disabled=isGetDisabled v-on:click=getRecords>Get records</b-button>
           </div>
           <div class="column is-one-quarter">
-            <button class="button is-light is-primary"
+            <button class="button is-light is-primary" :disabled="isAddDisabled"
                     @click="isComponentModalActive = true">
               Add record
             </button>
@@ -94,6 +94,11 @@
       <b-table-column field="ttl" label="TTL" v-slot="props" width="50">
         {{ props.row.ttl }}
       </b-table-column>
+
+      <b-table-column field="Delete" v-slot="props" label="Delete" width="50">
+        <b-button :idRow="props.row.id" type="is-danger is-light" @click="deleteRecord">❌</b-button>
+      </b-table-column>
+
     </b-table>
   </div>
 </template>
@@ -102,24 +107,11 @@
 import rrtt from "rr-to-type";
 import AddRecordForm from "@/components/AddRecordForm";
 
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-function transformRecordType(record) {
-  switch (record) {
-    case "A":
-      return "A"
-    case "AAAA":
-      return "AAAA"
-    default:
-      return capitalizeFirstLetter(record.toLowerCase())
-  }
-}
 export default {
   name: 'WebDNSEditor',
   methods: {
     getRecords: async function () {
+      this.isDomainInputDisabled = true;
       let dataaa = this.data;
       this.isLoading = true;
 
@@ -146,13 +138,12 @@ export default {
         data.forEach((element) => {
 
           let typeRecord = rrtt.RRToType(element.Hdr.Rrtype);
-          let recordAjusted = transformRecordType(typeRecord);
 
-          let rtarget = "element." + recordAjusted;
+          let rtarget = "element." + typeRecord;
           let recordTarget = eval(rtarget);
-          console.log(recordAjusted)
-          switch (recordAjusted) {
-            case "Soa":
+          console.log(typeRecord)
+          switch (typeRecord) {
+            case "SOA":
               recordTarget = "NS: "+element.Ns
               recordTarget += "| Mailbox: "+ element.Mbox;
               recordTarget += "| Serial: "+ element.Serial;
@@ -160,10 +151,28 @@ export default {
               recordTarget += "| MinTTL: "+ element.Minttl;
               recordTarget += "| Retry: "+ element.Retry;
               break
-            case "Cname":
+            case "CNAME":
               recordTarget = element.Target
               break
+            case "A":
+              recordTarget = element.A
+              break
+            case "AAAA":
+              recordTarget = element.AAAA;
+              break
+            case "NS":
+              recordTarget = element.Ns;
+              break
+            case "MX":
+              recordTarget = element.Preference + " " + element.Mx;
+              break
+            case "TXT":
+              recordTarget =  element.Txt;
+              break
+
             default:
+              recordTarget = "This record is not supported yet";
+              recordTarget = element
               break
           }
 
@@ -185,13 +194,17 @@ export default {
       this.isClearDisabled = false;
       this.isSendDisabled = false;
       this.isGetDisabled = true;
+      this.isAddDisabled = false;
     },
     clearRecords: function () {
       this.data = [];
+      this.addedRecords = [];
       this.index = 0;
       this.isClearDisabled = true;
       this.isSendDisabled = true;
       this.isGetDisabled = false;
+      this.isDomainInputDisabled = false;
+      this.isAddDisabled = true;
     },
     addNewRecord(variable) {
       this.test = variable;
@@ -218,22 +231,41 @@ export default {
         "server": this.server,
         "newRecords": this.addedRecords,
       };
-      console.log(requestData)
       console.log(JSON.stringify(requestData));
-      let payload = encodeURIComponent(JSON.stringify(requestData));
-      console.log(payload)
 
-      this.$buefy.dialog.confirm({
+      let payload = encodeURIComponent(JSON.stringify(requestData));
+
+      let buefy = this.$buefy
+      buefy.dialog.confirm({
         message: 'Are you sure you want to continue?',
         onConfirm: function (){
           fetch("https://webdns-api.luc.ovh/addRecords?data=" + payload)
               .then(function (response) {
                 // The response is a Response instance.
                 // You parse the data into a useable format using `.json()`
-                console.log(response);
-              })
+                return response.json();
+              }).then(function (data) {
+           console.log(data.success)
+            // I mean, who needs error handling?
+            buefy.toast.open({
+              message: 'Records were added successfully!',
+              type: 'is-success'
+            })
+
+          });
         }})
-    }
+
+    },
+    deleteRecord(event) {
+      console.log(Object.values(event.currentTarget));
+      let idRow = event.currentTarget.getAttribute("idrow");
+      const toDelete = this.data.findIndex(element => element.id === parseInt(idRow));
+      if (toDelete < 0) {
+        console.log("Uh, something broke: " + toDelete)
+        return
+      }
+      this.data.splice(toDelete,1);
+      }
   },
   data() {
     let data = []
@@ -259,6 +291,8 @@ export default {
       "isClearDisabled": true,
       "isGetDisabled": false,
       "isSendDisabled": true,
+      "isAddDisabled": true,
+      "isDomainInputDisabled": false,
     }
   },
   components: {
