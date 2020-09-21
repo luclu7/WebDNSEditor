@@ -9,6 +9,7 @@
           <option value="A">A</option>
           <option value="AAAA">AAAA</option>
           <option value="CNAME">CNAME</option>
+          <option value="TXT">TXT</option>
         </b-select>
       </b-field>
 
@@ -17,6 +18,7 @@
           <b-input v-if='typeOfRecord === "A"' v-model="target" required pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$"></b-input>
           <b-input v-if='typeOfRecord === "AAAA"' v-model="target" required pattern="^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$"></b-input>
           <b-input v-if='typeOfRecord === "CNAME"' v-model="target" required pattern="^(([a-zA-Z0-9_]|[a-zA-Z0-9_][a-zA-Z0-9_\-]*[a-zA-Z0-9_])\.)*([A-Za-z0-9_]|[A-Za-z0-9_][A-Za-z0-9_\-]*[A-Za-z0-9_](\.?))$"></b-input>
+          <b-input v-if='typeOfRecord === "TXT"' v-model="target" required></b-input>
         </b-field>
       </div>
 
@@ -62,11 +64,23 @@ export default {
   methods: {
     sendData: function () {
       this.$emit('sendNewRecord', [this.subdomain+"."+this.domain,this.target,this.typeOfRecord,this.TTL])
+      this.$buefy.toast.open({
+        message: 'Record added successfully!',
+        type: 'is-success'
+      })
     }
   },
   change: {
     target(newTarget) {
       console.log(newTarget);
+    },
+    typeOfRecord(newType) {
+      localStorage.typeOfRecord = newType;
+    }
+  },
+  mounted() {
+    if (localStorage.typeOfRecord) {
+      this.typeOfRecord = localStorage.typeOfRecord;
     }
   }
 }
