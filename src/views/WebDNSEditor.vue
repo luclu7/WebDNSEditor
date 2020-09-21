@@ -85,7 +85,7 @@
       <b-table-column field="name" label="Name" v-slot="props">
         {{ props.row.name }}
       </b-table-column>
-      <b-table-column field="target" label="Target" v-slot="props" width="80">
+      <b-table-column field="target" label="Target" v-slot="props">
         {{ props.row.target }}
       </b-table-column>
       <b-table-column field="type" label="Type" v-slot="props">
@@ -226,7 +226,7 @@ export default {
       this.$buefy.dialog.confirm({
         message: 'Are you sure you want to continue?',
         onConfirm: function (){
-          fetch("http://localhost:8080/addRecords?data=" + payload)
+          fetch("https://webdns-api.luc.ovh/addRecords?data=" + payload)
               .then(function (response) {
                 // The response is a Response instance.
                 // You parse the data into a useable format using `.json()`
@@ -240,9 +240,10 @@ export default {
     let addedRecords = []
     let index = 1;
     let fieldAreFull = false;
-    let secretKey, server, domain, algo, keyname;
+    let secretKey, server, domain, algo, keyname, APIServer;
     return {
       data,
+      APIServer,
       index,
       fieldAreFull,
       algo,
@@ -279,6 +280,9 @@ export default {
     if (localStorage.algo) {
       this.algo = localStorage.algo;
     }
+    if (localStorage.APIServer) {
+      this.APIServer = localStorage.APIServer;
+    }
   },
   watch: {
     secretKey(newKey) {
@@ -295,6 +299,9 @@ export default {
     },
     algo(newAlgo) {
       localStorage.algo = newAlgo;
+    },
+    APIServer(newAPIServer) {
+      localStorage.APIServer = newAPIServer;
     }
   }
 
