@@ -134,8 +134,8 @@ export default {
       let payload = encodeURIComponent(JSON.stringify(requestData));
       await new Promise(r => setTimeout(r, Math.random()*200));
       //console.log("http://localhost:8080/getRecords?data=" + payload);
-      //fetch("https://webdns.luc.ovh/getRecords?data=" + payload)
-        fetch("http://localhost:8080/getRecords?data=" + payload)
+      //fetch("http://localhost:8080/getRecords?data=" + payload)
+      fetch("https://webdns-api.luc.ovh/getRecords?data=" + payload)
           .then(function (response) {
             // The response is a Response instance.
             // You parse the data into a useable format using `.json()`
