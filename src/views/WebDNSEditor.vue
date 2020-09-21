@@ -96,7 +96,7 @@
       </b-table-column>
 
       <b-table-column field="Delete" v-slot="props" label="Delete" width="50">
-        <b-button :idRow="props.row.id" type="is-danger is-light" @click="deleteRecord">❌</b-button>
+        <b-button v-if='props.row.type !== "SOA"' :idRow="props.row.id" type="is-danger is-light" @click="deleteRecord">❌</b-button>
       </b-table-column>
 
     </b-table>
@@ -138,9 +138,7 @@ export default {
         data.forEach((element) => {
 
           let typeRecord = rrtt.RRToType(element.Hdr.Rrtype);
-
-          let rtarget = "element." + typeRecord;
-          let recordTarget = eval(rtarget);
+          let recordTarget;
           console.log(typeRecord)
           switch (typeRecord) {
             case "SOA":
@@ -169,7 +167,6 @@ export default {
             case "TXT":
               recordTarget =  element.Txt;
               break
-
             default:
               recordTarget = "This record is not supported yet";
               recordTarget = element
@@ -230,6 +227,7 @@ export default {
         "algo": this.algo,
         "server": this.server,
         "newRecords": this.addedRecords,
+        "remRecords": this.removedRecords
       };
       console.log(JSON.stringify(requestData));
 
@@ -260,16 +258,18 @@ export default {
       console.log(Object.values(event.currentTarget));
       let idRow = event.currentTarget.getAttribute("idrow");
       const toDelete = this.data.findIndex(element => element.id === parseInt(idRow));
+      this.removedRecords.splice(this.index, 0, this.data[toDelete]);
       if (toDelete < 0) {
         console.log("Uh, something broke: " + toDelete)
         return
       }
       this.data.splice(toDelete,1);
-      }
+}
   },
   data() {
     let data = []
-    let addedRecords = []
+    let addedRecords = [];
+    let removedRecords = [];
     let index = 1;
     let fieldAreFull = false;
     let secretKey, server, domain, algo, keyname, APIServer;
@@ -284,9 +284,8 @@ export default {
       secretKey,
       keyname,
       addedRecords,
+      removedRecords,
       isComponentModalActive: false,
-      formProps: {
-      },
       "isLoading": false,
       "isClearDisabled": true,
       "isGetDisabled": false,
