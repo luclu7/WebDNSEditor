@@ -119,11 +119,11 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import rrtt from "rr-to-type";
-import AddRecordForm from "@/components/AddRecordForm";
-import SOA from "@/components/SOA";
-import EditRecordForm from "@/components/EditRecordForm";
+import AddRecordForm from "../components/AddRecordForm";
+import SOA from "../components/SOA";
+import EditRecordForm from "../components/EditRecordForm";
 
 export default {
   name: 'WebDNSEditor',
@@ -210,7 +210,7 @@ export default {
           type: 'is-success'
         })
         self.isClearDisabled = false;
-        self.isSendDisabled = false;
+        self.isSendDisabled = true;
         self.isGetDisabled = true;
         self.isAddDisabled = false;
         self.isDomainInputDisabled = true;
@@ -255,6 +255,7 @@ export default {
       this.data.splice(this.index + 1, 0, currData);
       this.addedRecords.splice(this.index, 0, currData);
       this.removedRecords.splice(this.index + 1, 0, variable[0]);
+      this.isSendDisabled = false;
 
       //this.remRecords.splice(this.index, 0, variable[0]);
 
@@ -274,6 +275,7 @@ export default {
 
       this.addedRecords.splice(this.index, 0, currData);
       this.index++
+      this.isSendDisabled = false;
     },
     sendRecords() {
       let requestData= {
@@ -289,8 +291,8 @@ export default {
 
       let payload = encodeURIComponent(JSON.stringify(requestData));
 
-      let buefy = this.$buefy
-      buefy.dialog.confirm({
+      let self = this
+      self.$buefy.dialog.confirm({
         message: 'Are you sure you want to continue?',
         onConfirm: function (){
           fetch("http://localhost:8080/addRecords?data=" + payload)
@@ -301,27 +303,39 @@ export default {
               }).then(function (data) {
            console.log(data.success)
             // I mean, who needs error handling?
-            buefy.toast.open({
+            self.$buefy.toast.open({
               message: 'Records were added successfully!',
               type: 'is-success'
             })
+            self.addedRecords = [];
+            self.removedRecords = [];
+            self.isSendDisabled = true;
 
           }).catch(function(error) {
             console.log(error)
+            self.$buefy.toast.open({
+              message: 'An error occurred!',
+              type: 'is-danger'
+            })
+
           });
         }})
 
     },
     deleteRecord(event) {
-      console.log(Object.values(event.currentTarget));
       let idRow = event.currentTarget.getAttribute("idrow");
       const toDelete = this.data.findIndex(element => element.id === parseInt(idRow));
       this.removedRecords.splice(this.index, 0, this.data[toDelete]);
+      if (this.data[toDelete].type === "TXT") {
+        console.log(this.data[toDelete].target.join(" "));
+        this.data[toDelete].target = this.data[toDelete].target.join(' ')
+      }
       if (toDelete < 0) {
         console.log("Uh, something broke: " + toDelete)
         return
       }
       this.data.splice(toDelete,1);
+      this.isSendDisabled = false;
 }
   },
   data() {

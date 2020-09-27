@@ -20,7 +20,6 @@
           <b-input v-if='typeOfRecord === "AAAA"' v-model="target" required pattern="^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$"></b-input>
           <b-input v-if='typeOfRecord === "CNAME"' v-model="target" required pattern="^(([a-zA-Z0-9_]|[a-zA-Z0-9_][a-zA-Z0-9_\-]*[a-zA-Z0-9_])\.)*([A-Za-z0-9_]|[A-Za-z0-9_][A-Za-z0-9_\-]*[A-Za-z0-9_](\.?))$"></b-input>
           <b-input v-if='typeOfRecord === "TXT"' v-model="target" required></b-input>
-          <b-input v-if='typeOfRecord === "TXT"' v-model="target" required></b-input>
           <b-input v-if='typeOfRecord === "NS"' v-model="target" requiered></b-input>
         </b-field>
       </div>
@@ -56,17 +55,23 @@ export default {
     domain: String
   },
   data() {
-    let target, subdomain;
+    let target;
     return {
       "typeOfRecord": "A",
       target,
-      subdomain,
+      "subdomain": "",
       "TTL": 3600
     }
   },
   methods: {
     sendData: function () {
-      this.$emit('sendNewRecord', [this.subdomain+"."+this.domain,this.target,this.typeOfRecord,this.TTL])
+      let domain;
+      if (this.subdomain === "" || this.subdomain === "@") {
+          domain = this.domain;
+      } else {
+        domain = this.subdomain+"."+this.domain;
+      }
+      this.$emit('sendNewRecord', [domain,this.target,this.typeOfRecord,this.TTL])
       this.$buefy.toast.open({
         message: 'Record added successfully!',
         type: 'is-success'

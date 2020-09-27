@@ -43,14 +43,14 @@
     </section>
     <footer class="modal-card-foot">
       <button class="button" type="button" @click="$parent.close()">Close</button>
-      <button class="button is-primary" v-on:click="sendData">Edit</button>
+      <button class="button is-primary" @click="$parent.close()" v-on:click="sendData">Edit</button>
     </footer>
   </div>
 </template>
 
-<script>
-import {parseDomain, fromUrl} from "parse-domain";
+<script lang="ts">
 
+import {parseDomain, fromUrl} from "parse-domain";
 
 export default {
   name: "EditRecordForm",
@@ -76,7 +76,7 @@ export default {
       this.$buefy.toast.open({
         message: 'Record edited successfully!',
         type: 'is-success'
-      })
+      });
     }
   },
   mounted() {
