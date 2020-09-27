@@ -136,11 +136,13 @@ export default {
       this.editEvent = toEdit;
     },
     getRecords: async function () {
+      let buefy = this.$buefy;
       this.isDomainInputDisabled = true;
-      let dataaa = this.data;
       this.isLoading = true;
 
-      let indexx = 1;
+      let self = this
+
+
       let requestData = {
         "keyname": this.keyname,
         "domain": this.domain,
@@ -161,7 +163,6 @@ export default {
           }).then(function (data) {
         // `data` is the parsed version of the JSON returned from the above endpoint.
         data.forEach((element) => {
-
           let typeRecord = rrtt.RRToType(element.Hdr.Rrtype);
           let recordTarget;
           switch (typeRecord) {
@@ -193,28 +194,46 @@ export default {
           }
 
           let currData = {
-            'id': indexx,
+            'id': self.index,
             'name': element.Hdr.Name,
             'type': typeRecord,
             'target': recordTarget,
             'ttl': element.Hdr.Ttl
           };
 
-          dataaa.splice(indexx + 1, 0, currData);
-          indexx = indexx + 1;
+          self.data.splice(self.index + 1, 0, currData);
+          self.index = self.index + 1;
+
         })
+        buefy.toast.open({
+          message: 'Records were downloaded successfully',
+          type: 'is-success'
+        })
+        self.isClearDisabled = false;
+        self.isSendDisabled = false;
+        self.isGetDisabled = true;
+        self.isAddDisabled = false;
+        self.isDomainInputDisabled = true;
+
+      }).catch(function(error) {
+        console.log("uh")
+        console.log(error)
+        buefy.toast.open({
+          message: 'An error occurred!',
+          type: 'is-danger'
+        })
+        self.isClearDisabled = true;
+        self.isSendDisabled = true;
+        self.isGetDisabled = false;
+        self.isAddDisabled = true;
+        self.isDomainInputDisabled = false;
       });
-      this.data = dataaa;
-      this.index = indexx;
       this.isLoading = false;
-      this.isClearDisabled = false;
-      this.isSendDisabled = false;
-      this.isGetDisabled = true;
-      this.isAddDisabled = false;
     },
     clearRecords: function () {
       this.data = [];
       this.addedRecords = [];
+      this.removedRecords = [];
       this.index = 0;
       this.isClearDisabled = true;
       this.isSendDisabled = true;
@@ -235,7 +254,9 @@ export default {
       this.data.splice(this.index + 1, 1, variable[0]);
       this.data.splice(this.index + 1, 0, currData);
       this.addedRecords.splice(this.index, 0, currData);
+      this.removedRecords.splice(this.index + 1, 0, variable[0]);
 
+      //this.remRecords.splice(this.index, 0, variable[0]);
 
     },
     addNewRecord(variable) {
@@ -252,7 +273,6 @@ export default {
 
 
       this.addedRecords.splice(this.index, 0, currData);
-      this.remRecords.splice(this.index, 0, variable[0]);
       this.index++
     },
     sendRecords() {
@@ -286,6 +306,8 @@ export default {
               type: 'is-success'
             })
 
+          }).catch(function(error) {
+            console.log(error)
           });
         }})
 

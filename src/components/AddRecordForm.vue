@@ -10,6 +10,7 @@
           <option value="AAAA">AAAA</option>
           <option value="CNAME">CNAME</option>
           <option value="TXT">TXT</option>
+          <option value="NS">NS</option>
         </b-select>
       </b-field>
 
@@ -19,6 +20,8 @@
           <b-input v-if='typeOfRecord === "AAAA"' v-model="target" required pattern="^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$"></b-input>
           <b-input v-if='typeOfRecord === "CNAME"' v-model="target" required pattern="^(([a-zA-Z0-9_]|[a-zA-Z0-9_][a-zA-Z0-9_\-]*[a-zA-Z0-9_])\.)*([A-Za-z0-9_]|[A-Za-z0-9_][A-Za-z0-9_\-]*[A-Za-z0-9_](\.?))$"></b-input>
           <b-input v-if='typeOfRecord === "TXT"' v-model="target" required></b-input>
+          <b-input v-if='typeOfRecord === "TXT"' v-model="target" required></b-input>
+          <b-input v-if='typeOfRecord === "NS"' v-model="target" requiered></b-input>
         </b-field>
       </div>
 
