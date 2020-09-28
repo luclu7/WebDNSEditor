@@ -1,4 +1,6 @@
-# web
+# WebDNSEditor
+
+Needs [luclu7/dnswebserver](https://github.com/luclu7/dnswebserver) to run.
 
 ## Project setup
 ```
@@ -22,4 +24,3 @@ yarn lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
-# WebDNSEditor
